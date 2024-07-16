@@ -5,20 +5,28 @@ import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
-const ProfilePage = () => {
+interface User {
+    _id: string;
+    username: string
+    password: string
+    email: string
+}
+
+const ProfilePage: React.FC = () => {
     const router = useRouter();
-    const [userData, setUserData] = useState(null);
+    const [userData, setUserData] = useState<User | null>(null);
 
     useEffect(() => {
         getUserData();
-    }, []);
+    });
 
     const getUserData = async () => {
         try {
             const response = await axios.get('/api/users/me');
             setUserData(response.data.data);
-        } catch (error: any) {
-            console.log(error.message);
+        } catch (error) {
+            console.error("Failed to fetch user data:", error);
+            toast.error('Failed to fetch user data.');
         }
     };
 
@@ -27,9 +35,9 @@ const ProfilePage = () => {
             await axios.get('/api/users/logout');
             toast.success('Logout successful!');
             router.push('/login');
-        } catch (error: any) {
-            console.log(error.message);
-            toast.error(error.message);
+        } catch (error) {
+            console.error("Logout failed:", error);
+            toast.error('Logout failed.');
         }
     };
 
@@ -56,7 +64,7 @@ const ProfilePage = () => {
                 onClick={getUserData}
                 className="bg-green-800 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
             >
-                Get User Details
+                Refresh User Details
             </button>
         </div>
     );
